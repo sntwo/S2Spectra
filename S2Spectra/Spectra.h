@@ -25,6 +25,13 @@ public:
     float minY = 0;
     long count = 0;
     void render (SDL_Renderer*, float, float);
+    float xFactor = 1;
+    float yFactor = 1;
+    float xOffset = 0;
+    float yOffset = 0;
+    
+    float time(int);
+    float intensity(int, int);
 };
 
 #endif /* Spectra_hpp */

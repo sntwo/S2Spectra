@@ -19,18 +19,25 @@ Spectra::Spectra(){}
 
 void Spectra::render (SDL_Renderer* renderer, float screenWidth, float screenHeight){
     float h = screenHeight - 50;
-    float xFactor = screenWidth / maxX;
-    float yFactor = screenHeight / ((maxY - minY) * 1.5f); //pad out the y dimension a bit
+    xFactor = screenWidth / (maxX * 1.1);
+    yFactor = screenHeight / ((maxY - minY) * 1.5f); //pad out the y dimension a bit
     
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xFF, 0xFF);
     for (int i = 0; i < count; i++){
-        float x1 = times[i] * xFactor;
+        float x1 = times[i] * xFactor + 20;
         float y1 = h - intensities[i] * yFactor;
-        float x2 = times[i + 1] * xFactor;
+        float x2 = times[i + 1] * xFactor + 20;
         float y2 = h - intensities[i + 1] * yFactor;
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-        //cout << "drew point at " << times[i] * xFactor << intensities[i] * yFactor << "\n";
     }
+}
+
+float Spectra::time(int x){
+    return (x - 20) / xFactor;
+}
+float Spectra::intensity(int y, int screenHeight){
+    float h = screenHeight - 50;
+    return -(y - h) / yFactor;
 }
 
 Spectra::Spectra(std::string fileName) {

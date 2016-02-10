@@ -28,8 +28,8 @@ LWindow::LWindow()
     
     zOriginX = 0;
     zOriginY = 0;
-    zWidth = 640;
-    zHeight = 480;
+    zWidth = 0;
+    zHeight = 0;
     
 }
 
@@ -172,7 +172,7 @@ void LWindow::handleEvent(SDL_Event& e)
 		if (updateCaption)
 		{
 			std::stringstream caption;
-			caption << "Mouse X:  " << mx << "  Y:  " << my;
+            caption << "Time:  " << spectra.time(mx) << "  I:  " << spectra.intensity(my, mHeight);
 			SDL_SetWindowTitle(mWindow, caption.str().c_str());
 		}
 	
