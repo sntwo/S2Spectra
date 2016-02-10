@@ -1,7 +1,12 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2015)
-and may not be redistributed without written permission.*/
+///
+//  main.cpp
+//  S2Spectra
+//
+//  Created by Joshua Knapp on 2/9/16.
+//  Copyright © 2016 SnTwo. All rights reserved.
+//
 
-//Using SDL, SDL_image, standard IO, math, and strings
+
 #include <SDL.h>
 #include <stdio.h>
 #include <string>
@@ -94,7 +99,7 @@ bool loadMedia()
 
 void close()
 {
-	//Destroy window	
+	//Destroy window
 	SDL_DestroyRenderer(gRenderer);
 	//SDL_DestroyWindow(gWindow);
 	gWindow.free();
@@ -105,80 +110,10 @@ void close()
 	SDL_Quit();
 }
 
-class Spectra {
-	
-public:
-	Spectra(string);
-	float times[50000], intensities[50000];
-	float maxX = 0;
-	float maxY = 0;
-	float minX = 0;
-	float minY = 0;
-	long count;
-	void render (float, float);
-};
-
-void Spectra::render (float screenWidth, float screenHeight){
-	float h = (float)gWindow.getHeight() - 50;
-	float xFactor = screenWidth / maxX;
-	float yFactor = screenHeight / ((maxY - minY) * 1.5f); //pad out the y dimension a bit
-
-	for (int i = 0; i < count; i++){
-		float x1 = times[i] * xFactor;
-		float y1 = h - intensities[i] * yFactor;
-		float x2 = times[i + 1] * xFactor;
-		float y2 = h - intensities[i + 1] * yFactor;
-		SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
-		//cout << "drew point at " << times[i] * xFactor << intensities[i] * yFactor << "\n";
-	}
-}
-
-Spectra::Spectra(string fileName) {
-
-	string line;
-	ifstream myfile(fileName);
-	if (myfile.is_open()){
-
-		getline(myfile, line);  // chromatogram
-		cout << line << "\n";
-		getline(myfile, line);  // name
-		cout << line << "\n";
-		getline(myfile, line);  // data points
-		cout << line << "\n";
-		istringstream dp(line);
-		string skip;
-
-		dp >> skip >> skip >> count;
-		cout << "count: " << count << "\n";
-		getline(myfile, line);  // time & intensity
-
-		int idx = 0;
-		while (getline(myfile, line)){
-
-			istringstream iss(line);
-			float x;
-			float y;
-			iss >> x >> y;
-			times[idx] = x;
-			intensities[idx] = y;
-			//cout << "x:" << x << "y:" << y << '\n';
-
-			if (x > maxX) { maxX = x; }
-			if (x < minX) { minX = x; }
-			if (y > maxY) { maxY = y; }
-			if (y < minY) { minY = y; }
-
-			idx++;
-		}
-		myfile.close();
-
-		cout << "maxX is " << maxX << "\n";
-		cout << "maxY is " << maxY << "\n";
-	}
-}
 
 int main(int argc, char* args[])
 {
+	printf("Hello world");
 	//Start up SDL and create window
 	if (!init())
 	{
@@ -199,8 +134,13 @@ int main(int argc, char* args[])
 			//Event handler
 			SDL_Event e;
 
-			Spectra spec("export.txt");
+			Spectra spectra("export.txt");
 
+			if (!gWindow.isMinimized()){
+
+				gWindow.draw();
+
+			}
 			//While application is running
 			while (!quit){
 				//Handle events on queue
@@ -212,46 +152,10 @@ int main(int argc, char* args[])
 
 					gWindow.handleEvent(e);
 				}
-
-				if (!gWindow.isMinimized()){
-
-					//Clear screen
-					SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-					SDL_RenderClear(gRenderer);
-
-					////Render red filled quad
-					//SDL_Rect fillRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
-					//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-					//SDL_RenderFillRect(gRenderer, &fillRect);
-
-					////Render green outlined quad
-					//SDL_Rect outlineRect = { SCREEN_WIDTH / 6, SCREEN_HEIGHT / 6, SCREEN_WIDTH * 2 / 3, SCREEN_HEIGHT * 2 / 3 };
-					//SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-					//SDL_RenderDrawRect(gRenderer, &outlineRect);
-
-					////Draw blue horizontal line
-					//SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-					//SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-
-					SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-					float w = (float)gWindow.getWidth();
-					float h = (float)gWindow.getHeight();
-					spec.render(w, h);
-
-					////Draw vertical line of yellow dots
-					//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, 0xFF);
-					//for (int i = 0; i < SCREEN_HEIGHT; i += 4)
-					//{
-					//	SDL_RenderDrawPoint(gRenderer, SCREEN_WIDTH / 2, i);
-					//}
-
-					//Update screen
-					SDL_RenderPresent(gRenderer);
-				}
 			}
 
-				
-			
+
+
 		}
 	}
 

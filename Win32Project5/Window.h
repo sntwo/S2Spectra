@@ -1,6 +1,11 @@
 #ifndef SDL_H
-#include <SDL.h>
+
+#include "Spectra.h"
 #endif
+
+union SDL_Event;
+struct SDL_Window;
+struct SDL_Renderer;
 
 class LWindow
 {
@@ -10,6 +15,9 @@ public:
 
 	//Creates window
 	bool init();
+
+	Spectra spectra;
+	//Spectra spectras[6];
 
 	//Creates renderer from internal window
 	SDL_Renderer* createRenderer();
@@ -29,6 +37,9 @@ public:
 	bool hasKeyboardFocus();
 	bool isMinimized();
 
+	//draw the content
+	void draw();
+
 private:
 	//Window data
 	SDL_Window* mWindow;
@@ -43,5 +54,16 @@ private:
 	bool mKeyboardFocus;
 	bool mFullScreen;
 	bool mMinimized;
-};
 
+	//if a zoom box is being drawin
+	bool mTracking;
+	bool isZoomed;
+
+	//chromatogram zoom rectangle info
+	int zOriginX;
+	int zOriginY;
+	int zWidth;
+	int zHeight;
+	float xOffset;
+	float yOffset;
+};
