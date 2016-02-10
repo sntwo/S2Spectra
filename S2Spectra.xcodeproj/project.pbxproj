@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		75C9D1DB1C6ACBFF00CD3E0C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */; };
+		75C9D1E21C6ACCCE00CD3E0C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1E11C6ACCCE00CD3E0C /* Cocoa.framework */; };
+		75C9D1E41C6ACCFA00CD3E0C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1E31C6ACCFA00CD3E0C /* SDL2.framework */; };
+		75C9D1E71C6ACDF100CD3E0C /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1E51C6ACDF100CD3E0C /* Window.cpp */; };
+		75C9D1EE1C6ADBB700CD3E0C /* Spectra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +29,12 @@
 /* Begin PBXFileReference section */
 		75C9D1D71C6ACBFF00CD3E0C /* S2Spectra */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = S2Spectra; sourceTree = BUILT_PRODUCTS_DIR; };
 		75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		75C9D1E11C6ACCCE00CD3E0C /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		75C9D1E31C6ACCFA00CD3E0C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		75C9D1E51C6ACDF100CD3E0C /* Window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
+		75C9D1E61C6ACDF100CD3E0C /* Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
+		75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spectra.cpp; sourceTree = "<group>"; };
+		75C9D1ED1C6ADBB700CD3E0C /* Spectra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spectra.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75C9D1E41C6ACCFA00CD3E0C /* SDL2.framework in Frameworks */,
+				75C9D1E21C6ACCCE00CD3E0C /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +53,8 @@
 		75C9D1CE1C6ACBFF00CD3E0C = {
 			isa = PBXGroup;
 			children = (
+				75C9D1E31C6ACCFA00CD3E0C /* SDL2.framework */,
+				75C9D1E11C6ACCCE00CD3E0C /* Cocoa.framework */,
 				75C9D1D91C6ACBFF00CD3E0C /* S2Spectra */,
 				75C9D1D81C6ACBFF00CD3E0C /* Products */,
 			);
@@ -58,6 +72,10 @@
 			isa = PBXGroup;
 			children = (
 				75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */,
+				75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */,
+				75C9D1ED1C6ADBB700CD3E0C /* Spectra.h */,
+				75C9D1E51C6ACDF100CD3E0C /* Window.cpp */,
+				75C9D1E61C6ACDF100CD3E0C /* Window.h */,
 			);
 			path = S2Spectra;
 			sourceTree = "<group>";
@@ -118,7 +136,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75C9D1EE1C6ADBB700CD3E0C /* Spectra.cpp in Sources */,
 				75C9D1DB1C6ACBFF00CD3E0C /* main.cpp in Sources */,
+				75C9D1E71C6ACDF100CD3E0C /* Window.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +227,11 @@
 		75C9D1DF1C6ACBFF00CD3E0C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -214,6 +239,11 @@
 		75C9D1E01C6ACBFF00CD3E0C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
