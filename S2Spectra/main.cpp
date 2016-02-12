@@ -15,9 +15,12 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
 
 #include "Window.h"
+
+using namespace std;
+
+
 
 
 //Screen dimension constants
@@ -36,11 +39,14 @@ void close();
 //Loads individual image as texture
 SDL_Texture* loadTexture(std::string path);
 
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
+
 //Our custom window
 LWindow gWindow;
 
-//The window renderer
-SDL_Renderer* gRenderer = NULL;
+
+
 
 bool init()
 {
@@ -82,6 +88,8 @@ bool init()
                 SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
                 
             }
+        
+            
         }
     }
     
@@ -92,6 +100,7 @@ bool loadMedia()
 {
     //Loading success flag
     bool success = true;
+    
     
     //Nothing to load
     return success;
@@ -106,14 +115,12 @@ void close()
     //gWindow = NULL;
     gRenderer = NULL;
     
+
+    
+    
     //Quit SDL subsystems
     SDL_Quit();
 }
-
-
-
-
-
 
 
 int main(int argc, char* args[])
@@ -141,6 +148,11 @@ int main(int argc, char* args[])
             
             Spectra spectra("export.txt");
             
+            if (!gWindow.isMinimized()){
+                
+                gWindow.draw();
+                
+            }
             //While application is running
             while (!quit){
                 //Handle events on queue
@@ -151,41 +163,6 @@ int main(int argc, char* args[])
                     }
                     
                     gWindow.handleEvent(e);
-                }
-                
-                if (!gWindow.isMinimized()){
-                    
-                    gWindow.draw();
-                    
-                    
-                    ////Render red filled quad
-                    //SDL_Rect fillRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
-                    //SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-                    //SDL_RenderFillRect(gRenderer, &fillRect);
-                    
-                    ////Render green outlined quad
-                    //SDL_Rect outlineRect = { SCREEN_WIDTH / 6, SCREEN_HEIGHT / 6, SCREEN_WIDTH * 2 / 3, SCREEN_HEIGHT * 2 / 3 };
-                    //SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-                    //SDL_RenderDrawRect(gRenderer, &outlineRect);
-                    
-                    ////Draw blue horizontal line
-                    //SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-                    //SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-                    
-                    //SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-                    //float w = (float)gWindow.getWidth();
-                    //float h = (float)gWindow.getHeight();
-                    //spec.render(gRenderer, w, h);
-                    
-                    ////Draw vertical line of yellow dots
-                    //SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, 0xFF);
-                    //for (int i = 0; i < SCREEN_HEIGHT; i += 4)
-                    //{
-                    //	SDL_RenderDrawPoint(gRenderer, SCREEN_WIDTH / 2, i);
-                    //}
-                    
-                    //Update screen
-                    
                 }
             }
             

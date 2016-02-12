@@ -11,7 +11,9 @@
 
 #include <stdio.h>
 #include <string>
-#include <SDL2/SDL.h>
+//#include <SDL.h>
+
+struct SDL_Renderer;
 
 class Spectra {
     
@@ -24,14 +26,24 @@ public:
     float minX = 0;
     float minY = 0;
     long count = 0;
-    void render (SDL_Renderer*, float, float);
+    std::string name;
+    //void render(SDL_Renderer*);
+    //void render(SDL_Renderer*, float, float);
+    //void setXYFactor(float, float, float, float, float, float);
     float xFactor = 1;
     float yFactor = 1;
     float xOffset = 0;
     float yOffset = 0;
     
     float time(int);
-    float intensity(int, int);
+    float intensity(int);
+    
+    //void unzoom(float, float);
+    
+    bool isLoaded = false;
+    
+    //void getDisplayParameters(float &, float &, float &, float &);
+    //void setDisplayParamaters(float, float, float, float);
 };
 
 #endif /* Spectra_hpp */
