@@ -26,9 +26,9 @@ public:
 	float minX = 0;
 	float minY = 0;
 	long count = 0;
-	void render(SDL_Renderer*);
-	void render(SDL_Renderer*, float, float);
-	void setXYFactor(float, float, float, float, float, float);
+	//void render(SDL_Renderer*);
+	//void render(SDL_Renderer*, float, float);
+	//void setXYFactor(float, float, float, float, float, float);
 	float xFactor = 1;
 	float yFactor = 1;
 	float xOffset = 0;
@@ -37,7 +37,12 @@ public:
 	float time(int);
 	float intensity(int);
 
-	void unzoom(float, float);
+	//void unzoom(float, float);
+
+	bool isLoaded = false;
+
+	//void getDisplayParameters(float &, float &, float &, float &);
+	//void setDisplayParamaters(float, float, float, float);
 };
 
 #endif /* Spectra_hpp */

@@ -5,13 +5,15 @@
 #include <string>
 #include <fstream>
 #include <SDL.h>
-
+#include <SDL_ttf.h>
 
 //using namespace std;
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+SDL_Rect viewport;
 
 LWindow::LWindow()
 {
@@ -25,8 +27,10 @@ LWindow::LWindow()
 	isZoomed = false;
 	mWidth = 0;
 	mHeight = 0;
-	Spectra s("export.txt");
-	spectra = s;
+	//Spectra s("export.txt");
+	//spectra = s;
+
+	//spectra.unzoom(640.f, 480.f);
 
 	zOriginX = 0;
 	zOriginY = 0;
@@ -34,24 +38,79 @@ LWindow::LWindow()
 	zHeight = 0;
 
 	xOffset = 0;
-	yOffset = 0;
+	yOffset = -500000;
+
+	minIntensity = -200000.f;
+	maxIntensity = 2000000.f;
+	timeStart = 0.f;
+	timeEnd = 30.f;
+
+	xFactor = 1;
+	yFactor = 1;
+}
+
+void LWindow::setColor(int i) {
+	switch (i) {
+	case 0:
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0xFF, 0xFF); // yellow
+		break;
+	case 1:
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
+		break;
+	case 2:
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // black
+		break;
+	case 3:
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
+		break;
+	}
+}
+
+void LWindow::render(int idx)
+{
+	
+	for (int i = 0; i < spectras[idx].count; i++){
+		//intf("looping");
+		float x1 = (spectras[idx].times[i] - xOffset) * xFactor;
+		float y1 = viewport.h - (spectras[idx].intensities[i] - yOffset) * yFactor;
+		float x2 = (spectras[idx].times[i + 1] - xOffset) * xFactor;
+		float y2 = viewport.h - (spectras[idx].intensities[i + 1] - yOffset) * yFactor;
+		if (x2 < x1) { /* printf("found backwards line");*/ }
+		
+ 		else {
+			SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
+		}
+		//d::cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n";
+	}
+	
+
 }
 
 void LWindow::draw()
 {
-	//std::cout << spectra.count;
 	//Clear screen
 	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	if (!isZoomed) {
-		spectra.render(gRenderer);
-	}
-	else {
-		std::cout << "calling draw iwth yoffset " << yOffset << "\n";
-		spectra.render(gRenderer, xOffset, yOffset);
-	}
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 	
+	viewport.x = 10;
+	viewport.y = 10;
+	viewport.w = mWidth - 20;
+	viewport.h = mHeight / 1.6;
+	SDL_RenderSetViewport(gRenderer, &viewport);
+	SDL_Rect outline = { 0, 0, viewport.w, viewport.h };
+	SDL_RenderDrawRect(gRenderer, &outline);
+	
+	xFactor = viewport.w / (abs(timeEnd - timeStart));
+	yFactor = viewport.h / ((abs(maxIntensity - minIntensity)) * 1.2); //pad out the y dimension a bit
+
+	for (int i = 0; i < 6; i++){
+		if (spectras[i].isLoaded) {
+			setColor(i);
+			render(i);
+		}
+	}
 
 	if (mTracking) {
 		SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
@@ -63,6 +122,15 @@ void LWindow::draw()
 
 	SDL_RenderPresent(gRenderer);
 
+}
+
+float LWindow::time(int x){
+	return (x - viewport.x) / xFactor + xOffset;
+}
+
+float LWindow::intensity(int y){
+	y -= viewport.y;
+	return yOffset - (y - viewport.h) / yFactor;
 }
 
 bool LWindow::init()
@@ -157,11 +225,15 @@ void LWindow::handleEvent(SDL_Event& e)
 		break;
 
 	case SDL_DROPFILE: {
-		std::string line;
-		std::ifstream myfile(e.drop.file);
-		if (myfile.is_open()){
-			printf("opened file");
-		}}
+		int i = 0;
+		for (; i < 6; i++){
+			if (!spectras[i].isLoaded) {
+				break;
+			}
+		}
+		Spectra s(e.drop.file);
+		spectras[i] = s;
+		}
 		break;
 
 	case SDL_MOUSEMOTION:
@@ -184,17 +256,22 @@ void LWindow::handleEvent(SDL_Event& e)
 			mTracking = true;
 		}
 		else {
-			spectra.unzoom(mWidth, mHeight);
+			xOffset = 0;
+			yOffset = -20000;
+			minIntensity = -200000.f;
+			maxIntensity = 2000000.f;
+			timeStart = 0.f;
+			timeEnd = 30.f;
 			isZoomed = false;
 		}
 		break;
+
 	case SDL_MOUSEBUTTONUP:
 		if (e.button.button == SDL_BUTTON_LEFT) {
 			SDL_GetMouseState(&mx, &my);
-			std::cout << "zooming to region " << spectra.time(zOriginX) << " " << spectra.time(mx) << " " << spectra.intensity(my) << " " << spectra.intensity(zOriginY) << "\n";
-			xOffset = spectra.time(zOriginX);
-			yOffset = spectra.intensity(my);
-			spectra.setXYFactor(mWidth, mHeight, spectra.time(zOriginX), spectra.time(mx), spectra.intensity(my), spectra.intensity(zOriginY));
+			//std::cout << "zooming to region " << spectra.time(zOriginX) << " " << spectra.time(mx) << " " << spectra.intensity(my) << " " << spectra.intensity(zOriginY) << "\n";
+
+			//spectras[0].setXYFactor(mWidth, mHeight, spectras[0].time(zOriginX), spectras[0].time(mx), spectras[0].intensity(my), spectras[0].intensity(zOriginY));
 			isZoomed = true;
 			mTracking = false;
 			draw();
@@ -207,8 +284,7 @@ void LWindow::handleEvent(SDL_Event& e)
 	if (updateCaption)
 	{
 		std::stringstream caption;
-		caption << "Time:  " << spectra.time(mx) << "  I:  " << spectra.intensity(my);
-		
+		caption << "Time:  " << time(mx) << "  I:  " << intensity(my);
 		SDL_SetWindowTitle(mWindow, caption.str().c_str());
 	}
 

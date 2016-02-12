@@ -6,6 +6,7 @@
 union SDL_Event;
 struct SDL_Window;
 struct SDL_Renderer;
+struct SDL_Rect;
 
 class LWindow
 {
@@ -17,7 +18,10 @@ public:
 	bool init();
 
 	Spectra spectra;
-	//Spectra spectras[6];
+
+	
+	
+	Spectra spectras[6];
 
 	//Creates renderer from internal window
 	SDL_Renderer* createRenderer();
@@ -44,6 +48,8 @@ private:
 	//Window data
 	SDL_Window* mWindow;
 	SDL_Renderer* gRenderer;
+	
+	void setColor(int i);
 
 	//Window dimensions
 	int mWidth;
@@ -66,4 +72,16 @@ private:
 	int zHeight;
 	float xOffset;
 	float yOffset;
+
+	void render(int);
+	float timeStart;
+	float timeEnd;
+	float minIntensity;
+	float maxIntensity;
+
+	float time(int);
+	float intensity(int);
+
+	float xFactor;
+	float yFactor;
 };
