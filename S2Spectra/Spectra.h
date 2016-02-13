@@ -3,7 +3,7 @@
 //  S2Spectra
 //
 //  Created by Joshua Knapp on 2/9/16.
-//  Copyright Â© 2016 SnTwo. All rights reserved.
+//  Copyright © 2016 SnTwo. All rights reserved.
 //
 
 #ifndef Spectra_hpp
@@ -16,34 +16,35 @@
 struct SDL_Renderer;
 
 class Spectra {
-    
+
 public:
-    Spectra();
-    Spectra(std::string);
-    float times[50000], intensities[50000];
-    float maxX = 0;
-    float maxY = 0;
-    float minX = 0;
-    float minY = 0;
-    long count = 0;
-    std::string name;
-    //void render(SDL_Renderer*);
-    //void render(SDL_Renderer*, float, float);
-    //void setXYFactor(float, float, float, float, float, float);
-    float xFactor = 1;
-    float yFactor = 1;
-    float xOffset = 0;
-    float yOffset = 0;
-    
-    float time(int);
-    float intensity(int);
-    
-    //void unzoom(float, float);
-    
-    bool isLoaded = false;
-    
-    //void getDisplayParameters(float &, float &, float &, float &);
-    //void setDisplayParamaters(float, float, float, float);
+	Spectra();
+	Spectra(std::string);
+	float times[50000], intensities[50000];
+	float maxX = 0;
+	float maxY = 0;
+	float minX = 0;
+	float minY = 0;
+	long count = 0;
+	std::string name;
+	//void render(SDL_Renderer*);
+	//void render(SDL_Renderer*, float, float);
+	//void setXYFactor(float, float, float, float, float, float);
+	float xFactor = 1;
+	float yFactor = 1;
+	float xOffset = 0;
+	float yOffset = 0;
+
+	float time(int);
+	float intensity(int);
+
+	//void unzoom(float, float);
+
+	bool isLoaded = false;
+	bool isKey = false;
+
+	//void getDisplayParameters(float &, float &, float &, float &);
+	//void setDisplayParamaters(float, float, float, float);
 };
 
 #endif /* Spectra_hpp */

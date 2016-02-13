@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		75C9D1DB1C6ACBFF00CD3E0C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */; };
 		75C9D1E21C6ACCCE00CD3E0C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1E11C6ACCCE00CD3E0C /* Cocoa.framework */; };
 		75C9D1E41C6ACCFA00CD3E0C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1E31C6ACCFA00CD3E0C /* SDL2.framework */; };
-		75C9D1E71C6ACDF100CD3E0C /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1E51C6ACDF100CD3E0C /* Window.cpp */; };
-		75C9D1EE1C6ADBB700CD3E0C /* Spectra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */; };
-		75C9D1F11C6D8EF600CD3E0C /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75C9D1EF1C6D8EF600CD3E0C /* Texture.cpp */; };
 		75C9D1F31C6D902900CD3E0C /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1F21C6D902900CD3E0C /* SDL2_image.framework */; };
 		75C9D1F51C6D93FA00CD3E0C /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75C9D1F41C6D93FA00CD3E0C /* SDL2_ttf.framework */; };
+		75EB3FCF1C6EC61C0019E15D /* Source.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75EB3FCE1C6EC61C0019E15D /* Source.cpp */; };
+		75EB3FD41C6EC62C0019E15D /* Spectra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75EB3FD01C6EC62C0019E15D /* Spectra.cpp */; };
+		75EB3FD51C6EC62C0019E15D /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75EB3FD21C6EC62C0019E15D /* Texture.cpp */; };
+		75EB3FD81C6EC6360019E15D /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75EB3FD61C6EC6360019E15D /* Window.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,19 +31,19 @@
 
 /* Begin PBXFileReference section */
 		75C9D1D71C6ACBFF00CD3E0C /* S2Spectra */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = S2Spectra; sourceTree = BUILT_PRODUCTS_DIR; };
-		75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		75C9D1E11C6ACCCE00CD3E0C /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		75C9D1E31C6ACCFA00CD3E0C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
-		75C9D1E51C6ACDF100CD3E0C /* Window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
-		75C9D1E61C6ACDF100CD3E0C /* Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
-		75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spectra.cpp; sourceTree = "<group>"; };
-		75C9D1ED1C6ADBB700CD3E0C /* Spectra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spectra.h; sourceTree = "<group>"; };
-		75C9D1EF1C6D8EF600CD3E0C /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
-		75C9D1F01C6D8EF600CD3E0C /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		75C9D1F21C6D902900CD3E0C /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		75C9D1F41C6D93FA00CD3E0C /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		75C9D1F71C6DA18B00CD3E0C /* OpenSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Light.ttf"; sourceTree = "<group>"; };
 		75C9D1F81C6DA19800CD3E0C /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		75EB3FCE1C6EC61C0019E15D /* Source.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Source.cpp; sourceTree = "<group>"; };
+		75EB3FD01C6EC62C0019E15D /* Spectra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spectra.cpp; sourceTree = "<group>"; };
+		75EB3FD11C6EC62C0019E15D /* Spectra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spectra.h; sourceTree = "<group>"; };
+		75EB3FD21C6EC62C0019E15D /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
+		75EB3FD31C6EC62C0019E15D /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
+		75EB3FD61C6EC6360019E15D /* Window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Window.cpp; sourceTree = "<group>"; };
+		75EB3FD71C6EC6360019E15D /* Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,13 +86,13 @@
 		75C9D1D91C6ACBFF00CD3E0C /* S2Spectra */ = {
 			isa = PBXGroup;
 			children = (
-				75C9D1DA1C6ACBFF00CD3E0C /* main.cpp */,
-				75C9D1EC1C6ADBB700CD3E0C /* Spectra.cpp */,
-				75C9D1ED1C6ADBB700CD3E0C /* Spectra.h */,
-				75C9D1E51C6ACDF100CD3E0C /* Window.cpp */,
-				75C9D1E61C6ACDF100CD3E0C /* Window.h */,
-				75C9D1EF1C6D8EF600CD3E0C /* Texture.cpp */,
-				75C9D1F01C6D8EF600CD3E0C /* Texture.h */,
+				75EB3FCE1C6EC61C0019E15D /* Source.cpp */,
+				75EB3FD01C6EC62C0019E15D /* Spectra.cpp */,
+				75EB3FD11C6EC62C0019E15D /* Spectra.h */,
+				75EB3FD21C6EC62C0019E15D /* Texture.cpp */,
+				75EB3FD31C6EC62C0019E15D /* Texture.h */,
+				75EB3FD61C6EC6360019E15D /* Window.cpp */,
+				75EB3FD71C6EC6360019E15D /* Window.h */,
 			);
 			path = S2Spectra;
 			sourceTree = "<group>";
@@ -153,10 +153,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				75C9D1EE1C6ADBB700CD3E0C /* Spectra.cpp in Sources */,
-				75C9D1F11C6D8EF600CD3E0C /* Texture.cpp in Sources */,
-				75C9D1DB1C6ACBFF00CD3E0C /* main.cpp in Sources */,
-				75C9D1E71C6ACDF100CD3E0C /* Window.cpp in Sources */,
+				75EB3FD51C6EC62C0019E15D /* Texture.cpp in Sources */,
+				75EB3FD41C6EC62C0019E15D /* Spectra.cpp in Sources */,
+				75EB3FCF1C6EC61C0019E15D /* Source.cpp in Sources */,
+				75EB3FD81C6EC6360019E15D /* Window.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +285,7 @@
 				75C9D1E01C6ACBFF00CD3E0C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

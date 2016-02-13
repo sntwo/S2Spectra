@@ -3,7 +3,7 @@
 //  S2Spectra
 //
 //  Created by Joshua Knapp on 2/9/16.
-//  Copyright Â© 2016 SnTwo. All rights reserved.
+//  Copyright © 2016 SnTwo. All rights reserved.
 //
 
 #include "Spectra.h"
@@ -86,53 +86,53 @@ float yOffset = 0;
 //}
 
 Spectra::Spectra(std::string fileName) {
-    
-    
-    
-    string line;
-    ifstream myfile(fileName);
-    if (myfile.is_open()){
-        
-        getline(myfile, line);  // chromatogram
-        cout << line << "\n";
-        getline(myfile, name);  // name
-        cout << name << "\n";
-        getline(myfile, line);  // data points
-        cout << line << "\n";
-        istringstream dp(line);
-        string skip;
-        
-        dp >> skip >> skip >> count;
-        cout << "count: " << count << "\n";
-        getline(myfile, line);  // time & intensity
-        
-        int idx = 0;
-        while (getline(myfile, line)){
-            
-            istringstream iss(line);
-            float x;
-            float y;
-            iss >> x >> y;
-            times[idx] = x;
-            intensities[idx] = y;
-            //cout << "x:" << x << "y:" << y << '\n';
-            
-            if (x > maxX) { maxX = x; }
-            if (x < minX) { minX = x; }
-            if (y > maxY) { maxY = y; }
-            if (y < minY) { minY = y; }
-            
-            idx++;
-        }
-        myfile.close();
-        
-        cout << "maxX is " << maxX << "\n";
-        cout << "minX is " << minX << "\n";
-        cout << "maxY is " << maxY << "\n";
-        cout << "minY is " << minY << "\n";
-    }
-    
-    isLoaded = true;
+
+
+
+	string line;
+	ifstream myfile(fileName);
+	if (myfile.is_open()){
+
+		getline(myfile, line);  // chromatogram
+		cout << line << "\n";
+		getline(myfile, name);  // name
+		cout << name << "\n";
+		getline(myfile, line);  // data points
+		cout << line << "\n";
+		istringstream dp(line);
+		string skip;
+
+		dp >> skip >> skip >> count;
+		cout << "count: " << count << "\n";
+		getline(myfile, line);  // time & intensity
+
+		int idx = 0;
+		while (getline(myfile, line)){
+
+			istringstream iss(line);
+			float x;
+			float y;
+			iss >> x >> y;
+			times[idx] = x;
+			intensities[idx] = y;
+			//cout << "x:" << x << "y:" << y << '\n';
+
+			if (x > maxX) { maxX = x; }
+			if (x < minX) { minX = x; }
+			if (y > maxY) { maxY = y; }
+			if (y < minY) { minY = y; }
+
+			idx++;
+		}
+		myfile.close();
+
+		cout << "maxX is " << maxX << "\n";
+		cout << "minX is " << minX << "\n";
+		cout << "maxY is " << maxY << "\n";
+		cout << "minY is " << minY << "\n";
+	}
+
+	isLoaded = true;
 }
 
 //void Spectra::unzoom(float screenWidth, float screenHeight) {
