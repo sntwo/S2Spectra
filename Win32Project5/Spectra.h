@@ -26,6 +26,7 @@ public:
 	float minX = 0;
 	float minY = 0;
 	long count = 0;
+	std::string name;
 	//void render(SDL_Renderer*);
 	//void render(SDL_Renderer*, float, float);
 	//void setXYFactor(float, float, float, float, float, float);
@@ -40,6 +41,7 @@ public:
 	//void unzoom(float, float);
 
 	bool isLoaded = false;
+	bool isKey = false;
 
 	//void getDisplayParameters(float &, float &, float &, float &);
 	//void setDisplayParamaters(float, float, float, float);

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
-#include <SDL.h>
+
 
 using namespace std;
 
@@ -47,8 +47,8 @@ float yOffset = 0;
 //	outline.h = viewport.h;
 //	SDL_RenderSetViewport(renderer, &viewport);
 //	SDL_RenderDrawRect(renderer, &outline);
-//	
-//	
+//
+//
 //	for (int i = 0; i < count; i++){
 //		float x1 = (times[i] - xOffset) * xFactor;
 //		float y1 = viewport.h - (intensities[i] - yOffset) * yFactor - 30;
@@ -71,7 +71,7 @@ float yOffset = 0;
 //	viewport.y = 10;
 //	viewport.w = screenWidth - 20;
 //	viewport.h = screenHeight / 1.6;
-//	
+//
 //	xFactor = viewport.w / (abs(xMax - xMin));
 //	yFactor = viewport.h / ((abs(yMax - yMin)) * 1.2); //pad out the y dimension a bit
 //	cout << "xFactor is " << xFactor << "  yFactor is " << yFactor << "\n";
@@ -87,7 +87,7 @@ float yOffset = 0;
 
 Spectra::Spectra(std::string fileName) {
 
-	
+
 
 	string line;
 	ifstream myfile(fileName);
@@ -95,8 +95,8 @@ Spectra::Spectra(std::string fileName) {
 
 		getline(myfile, line);  // chromatogram
 		cout << line << "\n";
-		getline(myfile, line);  // name
-		cout << line << "\n";
+		getline(myfile, name);  // name
+		cout << name << "\n";
 		getline(myfile, line);  // data points
 		cout << line << "\n";
 		istringstream dp(line);

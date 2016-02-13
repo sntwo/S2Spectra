@@ -1,4 +1,4 @@
-///
+//
 //  main.cpp
 //  S2Spectra
 //
@@ -7,6 +7,7 @@
 //
 
 
+//#include <SDL2/SDL.h>
 #include <SDL.h>
 #include <stdio.h>
 #include <string>
@@ -15,9 +16,12 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
 
 #include "Window.h"
+
+using namespace std;
+
+
 
 
 //Screen dimension constants
@@ -36,11 +40,14 @@ void close();
 //Loads individual image as texture
 SDL_Texture* loadTexture(std::string path);
 
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
+
 //Our custom window
 LWindow gWindow;
 
-//The window renderer
-SDL_Renderer* gRenderer = NULL;
+
+
 
 bool init()
 {
@@ -82,6 +89,8 @@ bool init()
 				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
 			}
+
+
 		}
 	}
 
@@ -92,6 +101,7 @@ bool loadMedia()
 {
 	//Loading success flag
 	bool success = true;
+
 
 	//Nothing to load
 	return success;
@@ -105,6 +115,9 @@ void close()
 	gWindow.free();
 	//gWindow = NULL;
 	gRenderer = NULL;
+
+
+
 
 	//Quit SDL subsystems
 	SDL_Quit();

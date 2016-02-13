@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Spectra.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Window.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -95,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Spectra.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

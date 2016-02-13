@@ -1,7 +1,7 @@
 #ifndef SDL_H
 
 #include "Spectra.h"
-#endif
+#include "Texture.h"
 
 union SDL_Event;
 struct SDL_Window;
@@ -17,11 +17,9 @@ public:
 	//Creates window
 	bool init();
 
-	Spectra spectra;
 
-	
-	
 	Spectra spectras[6];
+	LTexture nameTextures[6];
 
 	//Creates renderer from internal window
 	SDL_Renderer* createRenderer();
@@ -48,8 +46,9 @@ private:
 	//Window data
 	SDL_Window* mWindow;
 	SDL_Renderer* gRenderer;
-	
+
 	void setColor(int i);
+	SDL_Color getColor(int i);
 
 	//Window dimensions
 	int mWidth;
@@ -84,4 +83,14 @@ private:
 
 	float xFactor;
 	float yFactor;
+
+	//checks to see if click is in name box region, returning index of spectra if true or -1 if false
+	int checkNameBoxes(int x, int y);
+
+	void makeKey(int i);
 };
+
+
+
+
+#endif

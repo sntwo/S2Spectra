@@ -1,19 +1,28 @@
+//#include <SDL2/SDL.h>
+
 #include "Window.h"
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <fstream>
+
 #include <SDL.h>
-#include <SDL_ttf.h>
+
+//#include <SDL_ttf.h>
 
 //using namespace std;
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = 700;
 
 SDL_Rect viewport;
+
+//Globally used font
+TTF_Font *gFont = NULL;
+TTF_Font *gFontBold = NULL;
+LTexture gTextTexture;
 
 LWindow::LWindow()
 {
@@ -47,6 +56,10 @@ LWindow::LWindow()
 
 	xFactor = 1;
 	yFactor = 1;
+
+
+
+
 }
 
 void LWindow::setColor(int i) {
@@ -66,6 +79,27 @@ void LWindow::setColor(int i) {
 	}
 }
 
+SDL_Color LWindow::getColor(int i){
+	std::cout << "supplying color for int " << i << "\n";
+	SDL_Color textColor;
+	switch (i) {
+	case 0:
+		std::cout << "supplying yellow \n";
+		textColor = { 0, 1, 1 }; // yellow
+		break;
+	case 1:
+		textColor = { 1, 0, 0 }; // red
+		break;
+	case 2:
+		textColor = { 0, 0, 0 }; // black
+		break;
+	case 3:
+		textColor = { 0, 1, 0 }; // green
+		break;
+	}
+	return textColor;
+}
+
 void LWindow::render(int idx)
 {
 	
@@ -76,13 +110,15 @@ void LWindow::render(int idx)
 		float x2 = (spectras[idx].times[i + 1] - xOffset) * xFactor;
 		float y2 = viewport.h - (spectras[idx].intensities[i + 1] - yOffset) * yFactor;
 		if (x2 < x1) { /* printf("found backwards line");*/ }
-		
- 		else {
+
+		else {
 			SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
 		}
 		//d::cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n";
 	}
-	
+	//Render current frame
+	nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
+	SDL_RenderDrawLine(gRenderer, viewport.w - 200 - 30, 20 * idx + 8.5, viewport.w - 200 - 10, 20 * idx + 8.5);
 
 }
 
@@ -93,7 +129,7 @@ void LWindow::draw()
 	SDL_RenderClear(gRenderer);
 
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-	
+
 	viewport.x = 10;
 	viewport.y = 10;
 	viewport.w = mWidth - 20;
@@ -101,9 +137,9 @@ void LWindow::draw()
 	SDL_RenderSetViewport(gRenderer, &viewport);
 	SDL_Rect outline = { 0, 0, viewport.w, viewport.h };
 	SDL_RenderDrawRect(gRenderer, &outline);
-	
-	xFactor = viewport.w / (abs(timeEnd - timeStart));
-	yFactor = viewport.h / ((abs(maxIntensity - minIntensity)) * 1.2); //pad out the y dimension a bit
+
+	xFactor = viewport.w / (fabs(timeEnd - timeStart));
+	yFactor = viewport.h / ((fabs(maxIntensity - minIntensity)) * 1.2); //pad out the y dimension a bit
 
 	for (int i = 0; i < 6; i++){
 		if (spectras[i].isLoaded) {
@@ -120,17 +156,19 @@ void LWindow::draw()
 		SDL_RenderDrawRect(gRenderer, &outlineRect);
 	}
 
+
 	SDL_RenderPresent(gRenderer);
 
 }
 
 float LWindow::time(int x){
-	return (x - viewport.x) / xFactor + xOffset;
+	x -= viewport.x;
+	return x / xFactor + xOffset;
 }
 
 float LWindow::intensity(int y){
 	y -= viewport.y;
-	return yOffset - (y - viewport.h) / yFactor;
+	return (viewport.h - y) / yFactor + yOffset;
 }
 
 bool LWindow::init()
@@ -147,13 +185,37 @@ bool LWindow::init()
 	}
 
 
-
 	return mWindow != NULL;
 }
 
 SDL_Renderer* LWindow::createRenderer()
 {
 	gRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+
+	//Initialize SDL_ttf
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+		//success = false;
+	}
+
+	//Open the fonts
+	gFont = TTF_OpenFont("OpenSans-Light.ttf", 12);
+	if (gFont == NULL)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		//success = false;
+	}
+	gFontBold = TTF_OpenFont("OpenSans-Bold.ttf", 12);
+	if (gFontBold == NULL)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		//success = false;
+	}
+
+
+
 	return gRenderer;
 
 }
@@ -168,6 +230,20 @@ void LWindow::handleEvent(SDL_Event& e)
 	int my = 0;
 
 	switch (e.type) {
+	case SDL_KEYDOWN:
+		switch (e.key.keysym.sym) {
+		case SDLK_MINUS:
+			printf("unzooming");
+			xOffset = 0;
+			yOffset = -500000;
+			minIntensity = -200000.f;
+			maxIntensity = 2000000.f;
+			timeStart = 0.f;
+			timeEnd = 30.f;
+			isZoomed = false;
+			break;
+		}
+
 	case SDL_WINDOWEVENT:
 		switch (e.window.event){
 			//Get new dimensions and repaint on window size change
@@ -231,10 +307,13 @@ void LWindow::handleEvent(SDL_Event& e)
 				break;
 			}
 		}
+
 		Spectra s(e.drop.file);
 		spectras[i] = s;
+		makeKey(i);
+
 		}
-		break;
+	    break;
 
 	case SDL_MOUSEMOTION:
 		SDL_GetMouseState(&mx, &my);
@@ -247,17 +326,25 @@ void LWindow::handleEvent(SDL_Event& e)
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
+		SDL_GetMouseState(&mx, &my);
 		if (e.button.button == SDL_BUTTON_LEFT) {
-			SDL_GetMouseState(&mx, &my);
-			zWidth = 0;
-			zHeight = 0;
-			zOriginX = mx;
-			zOriginY = my;
-			mTracking = true;
+			int check = checkNameBoxes(mx, my);
+			if (check > -1) {
+				makeKey(check);
+			}
+			else {
+				SDL_GetMouseState(&mx, &my);
+				zWidth = 0;
+				zHeight = 0;
+				zOriginX = mx;
+				zOriginY = my;
+				mTracking = true;
+			}
 		}
 		else {
+			printf("unzooming");
 			xOffset = 0;
-			yOffset = -20000;
+			yOffset = -500000;
 			minIntensity = -200000.f;
 			maxIntensity = 2000000.f;
 			timeStart = 0.f;
@@ -268,10 +355,17 @@ void LWindow::handleEvent(SDL_Event& e)
 
 	case SDL_MOUSEBUTTONUP:
 		if (e.button.button == SDL_BUTTON_LEFT) {
+			if (!mTracking) break;
 			SDL_GetMouseState(&mx, &my);
-			//std::cout << "zooming to region " << spectra.time(zOriginX) << " " << spectra.time(mx) << " " << spectra.intensity(my) << " " << spectra.intensity(zOriginY) << "\n";
+			std::cout << "zooming to region " << time(zOriginX) << " " << time(mx) << " " << intensity(my) << " " << intensity(zOriginY) << "\n";
 
-			//spectras[0].setXYFactor(mWidth, mHeight, spectras[0].time(zOriginX), spectras[0].time(mx), spectras[0].intensity(my), spectras[0].intensity(zOriginY));
+			timeStart = time(zOriginX);
+			timeEnd = time(mx);
+			minIntensity = intensity(my);
+			maxIntensity = intensity(zOriginY);
+			xOffset = timeStart;
+			yOffset = minIntensity;
+
 			isZoomed = true;
 			mTracking = false;
 			draw();
@@ -290,12 +384,76 @@ void LWindow::handleEvent(SDL_Event& e)
 
 }
 
+void LWindow::makeKey(int idx) {
+	for (int i = 0; i < 6; i++){
+
+		if (!spectras[i].isLoaded) {
+			break;
+		}
+		if (i != idx) {
+			spectras[i].isKey = false;
+			if (nameTextures[i].isLoaded) {
+
+				SDL_Color tc = getColor(i);
+				nameTextures[i].isLoaded = false;
+				nameTextures[i].free();
+				if (!nameTextures[i].loadFromRenderedText(spectras[i].name, tc, gRenderer, gFont))
+				{
+					printf("Failed to render non bold text texture!\n");
+					//success = false;
+				}
+				else {
+					nameTextures[i].isLoaded = true;
+				}
+			}
+		}
+		else {
+			spectras[i].isKey = true;
+			if (nameTextures[i].isLoaded) {
+				nameTextures[i].isLoaded = false;
+				nameTextures[i].free();
+			}
+			SDL_Color tc = getColor(i);
+			if (!nameTextures[i].loadFromRenderedText(spectras[i].name, tc, gRenderer, gFontBold))
+			{
+				printf("Failed to render non bold text texture!\n");
+				//success = false;
+			}
+			else {
+				nameTextures[i].isLoaded = true;
+			}
+		}
+	}
+}
+
+int LWindow::checkNameBoxes(int x, int y){
+	std::cout << "checking " << x << " " << y << "\n";
+	for (int i = 0; i < 6; i++){
+		if (spectras[i].isLoaded) {
+			if (x > (viewport.w - 230) && y < (20 * i + 25) && y >(20 * i + 5)){
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
 void LWindow::free()
 {
 	if (mWindow != NULL)
 	{
 		SDL_DestroyWindow(mWindow);
 	}
+
+	//Free global font
+	TTF_CloseFont(gFont);
+	gFont = NULL;
+	TTF_CloseFont(gFontBold);
+	gFontBold = NULL;
+
+	TTF_Quit();
+
+	SDL_Quit();
 
 	mMouseFocus = false;
 	mKeyboardFocus = false;

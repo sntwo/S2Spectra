@@ -27,6 +27,9 @@
     <ClCompile Include="Spectra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Bitmap.bmp">
@@ -35,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Spectra.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
