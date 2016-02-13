@@ -56,6 +56,7 @@ LWindow::LWindow()
 
 	xFactor = 1;
 	yFactor = 1;
+    xSmoother = 0;
 
 
 
@@ -102,19 +103,35 @@ SDL_Color LWindow::getColor(int i){
 
 void LWindow::render(int idx)
 {
-	
+    float dif = timeEnd - timeStart;
+    float percent = dif / spectras[idx].maxX;
+    float n = spectras[idx].count * percent;
+    xSmoother = (int)(0.5 / (viewport.w / n) - 5);
+    if (xSmoother < 0) { xSmoother = 0 ;}
+    std::cout << "xsmooth is " << xSmoother << "\n";
+    
 	for (int i = 0; i < spectras[idx].count; i++){
 		//intf("looping");
-		float x1 = (spectras[idx].times[i] - xOffset) * xFactor;
-		float y1 = viewport.h - (spectras[idx].intensities[i] - yOffset) * yFactor;
-		float x2 = (spectras[idx].times[i + 1] - xOffset) * xFactor;
-		float y2 = viewport.h - (spectras[idx].intensities[i + 1] - yOffset) * yFactor;
-		if (x2 < x1) { /* printf("found backwards line");*/ }
 
-		else {
-			SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
-		}
+        while ( spectras[idx].times[i] < timeStart ) { i++; }
+        if ( spectras[idx].times[i] > timeEnd ) { break; }
+        if ( spectras[idx].intensities[i] < maxIntensity || spectras[idx].intensities[i + xSmoother + 1] < maxIntensity) {
+            if (spectras[idx].intensities[i] > minIntensity || spectras[idx].intensities[i + xSmoother + 1] > minIntensity) {
+        
+                float x1 = (spectras[idx].times[i] - xOffset) * xFactor;
+                float y1 = viewport.h - (spectras[idx].intensities[i] - yOffset) * yFactor;
+                float x2 = (spectras[idx].times[i + xSmoother + 1] - xOffset) * xFactor;
+                float y2 = viewport.h - (spectras[idx].intensities[i + xSmoother + 1] - yOffset) * yFactor;
+                if (x2 < x1) { /* printf("found backwards line");*/ }
+
+                else {
+                    SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
+                }
+            }
 		//d::cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n";
+        }
+        i += xSmoother;
+        
 	}
 	//Render current frame
 	nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
@@ -139,7 +156,7 @@ void LWindow::draw()
 	SDL_RenderDrawRect(gRenderer, &outline);
 
 	xFactor = viewport.w / (fabs(timeEnd - timeStart));
-	yFactor = viewport.h / ((fabs(maxIntensity - minIntensity)) * 1.2); //pad out the y dimension a bit
+    yFactor = viewport.h / ((fabs(maxIntensity - minIntensity)) ); //pad out the y dimension a bit
 
 	for (int i = 0; i < 6; i++){
 		if (spectras[i].isLoaded) {
