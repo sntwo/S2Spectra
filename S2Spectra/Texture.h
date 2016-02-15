@@ -3,7 +3,7 @@
 //  S2Spectra
 //
 //  Created by Joshua Knapp on 2/11/16.
-//  Copyright © 2016 SnTwo. All rights reserved.
+//  Copyright ï¿½ 2016 SnTwo. All rights reserved.
 //
 
 #ifndef Texture_hpp
@@ -12,8 +12,8 @@
 //#include <SDL2/SDL.h>
 //#include <SDL2_image/SDL_image.h>
 //#include <SDL_image.h>
-#include <SDL_ttf.h>
-//#include <SDL2_ttf/SDL_ttf.h>
+//#include <SDL_ttf.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <string>
 //#include <cmath>

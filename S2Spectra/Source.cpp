@@ -3,12 +3,12 @@
 //  S2Spectra
 //
 //  Created by Joshua Knapp on 2/9/16.
-//  Copyright © 2016 SnTwo. All rights reserved.
+//  Copyright ï¿½ 2016 SnTwo. All rights reserved.
 //
 
 
 //#include <SDL2/SDL.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <string>
 #include <sstream>

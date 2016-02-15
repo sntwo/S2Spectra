@@ -83,6 +83,7 @@ private:
 
 	float xFactor;
 	float yFactor;
+    int xSmoother;
 
 	//checks to see if click is in name box region, returning index of spectra if true or -1 if false
 	int checkNameBoxes(int x, int y);
