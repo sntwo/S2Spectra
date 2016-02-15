@@ -18,76 +18,93 @@ using namespace std;
 
 Spectra::Spectra(){}
 
-//SDL_Rect viewport;
-
 float xOffset = 0;
 float yOffset = 0;
 
-//void Spectra::getDisplayParameters(float &xOff, float &yOff, float &xFact, float &yFact){
-//	xOff = xOffset;
-//	yOff = yOffset;
-//	xFact = xFactor;
-//	yFact = yFactor;
-//}
-//
-//void Spectra::setDisplayParamaters(float xOff, float yOff, float xFact, float yFact){
-//
-//	xOffset = xOff;
-//	yOffset = yOff;
-//	xFactor = xFact;
-//	yFactor = yFact;
-//}
 
-//void Spectra::render(SDL_Renderer* renderer){
-//
-//	SDL_Rect outline;
-//	outline.x = 0;
-//	outline.w = viewport.w;
-//	outline.y = 0;
-//	outline.h = viewport.h;
-//	SDL_RenderSetViewport(renderer, &viewport);
-//	SDL_RenderDrawRect(renderer, &outline);
-//
-//
-//	for (int i = 0; i < count; i++){
-//		float x1 = (times[i] - xOffset) * xFactor;
-//		float y1 = viewport.h - (intensities[i] - yOffset) * yFactor - 30;
-//		float x2 = (times[i + 1] - xOffset) * xFactor;
-//		float y2 = viewport.h - (intensities[i + 1] - yOffset) * yFactor - 30;
-//		if (x2 < x1) { /* printf("found backwards line");*/ }
-//		else {
-//			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-//		}
-//	}
-//}
+int Spectra::getTimeIndexForTime(float t){
 
-//void Spectra::setXYFactor(float screenWidth, float screenHeight, float xMin, float xMax, float yMin, float yMax){
-//	printf("set xy factor");
-//	cout << "xMin is " << xMin << "  xMax is " << xMax << "\n";
-//
-//	xOffset = xMin;
-//	yOffset = yMin;
-//	viewport.x = 10;
-//	viewport.y = 10;
-//	viewport.w = screenWidth - 20;
-//	viewport.h = screenHeight / 1.6;
-//
-//	xFactor = viewport.w / (abs(xMax - xMin));
-//	yFactor = viewport.h / ((abs(yMax - yMin)) * 1.2); //pad out the y dimension a bit
-//	cout << "xFactor is " << xFactor << "  yFactor is " << yFactor << "\n";
-//}
+	float offset = maxX + 1;
+	//std::cout << "offset is " << offset << "\n";
+	for (int i = 0; i < count; i++){
+		float diff = fabs(times[i] - t);
+		//std::cout << "diff is " << diff << "\n";
+		if (diff < offset) {
+			offset = diff;
+		}
+		else {
+			return i;
+		}
+	}
 
-//float Spectra::time(int x){
-//	return (x - viewport.x) / xFactor + xOffset;
-//}
-//
-//float Spectra::intensity(int y){
-//	return yOffset - (y + 30 - viewport.h) / yFactor;
-//}
+	return 0;
+}
+
+
+int Spectra::integrate(float startTime, float endTime) {
+	printf("integrating");
+	//find first available integration
+	int emptyIndex;
+	for (emptyIndex = 0; emptyIndex < 50; emptyIndex++){
+		if (!integrations[emptyIndex].isSet) {
+			break;
+		}
+	}
+	int startIndex = getTimeIndexForTime(startTime);
+	int endIndex = getTimeIndexForTime(endTime);
+	integrations[emptyIndex].startIndex = startIndex;
+	integrations[emptyIndex].endIndex = endIndex;
+
+	/*std::cout << "integration index is " << emptyIndex << "\n";
+	std::cout << "set integration start time to " << times[integrations[emptyIndex].startIndex] << "\n";
+	std::cout << "set integration end time to " << times[integrations[emptyIndex].endIndex] << "\n";*/
+
+	//only count the integration if it is longer than one second
+	if (times[endIndex] - times[startIndex] > 0.016){
+		integrations[emptyIndex].isSet = true;
+	}
+
+	float rise = intensities[endIndex] - intensities[startIndex];
+	float run = times[endIndex] - times[startIndex];
+	float slope = rise / run;
+
+	float area = 0;
+	int runningHeightIndex = 0;
+	float runningHeight = 0;
+	for (int i = startIndex; i < endIndex + 1; i++){
+		if (intensities[i] > runningHeight) { runningHeight = intensities[i]; runningHeightIndex = i; }
+		float ct = intensities[i] - ( slope * ( times[i] - times[startIndex]) + intensities[startIndex] );
+		if (ct > 0) {
+			area += ct;
+		}
+	}
+	integrations[emptyIndex].area = area;
+	integrations[emptyIndex].time = times[runningHeightIndex];
+	std::cout << "area is " << area << "\n";
+
+	redoStrings();
+
+	return emptyIndex;
+}
+
+void Spectra::redoStrings()
+{
+	long totalCount = 0;
+	for (int i = 0; i < 50; i++){
+		if (integrations[i].isSet){
+			totalCount += integrations[i].area;
+		}
+	}
+
+	for (int i = 0; i < 50; i++){
+		if (integrations[i].isSet){
+			integrations[i].labelString = "";
+			integrations[i].labelString += std::to_string(100 * integrations[i].area / totalCount);
+		}
+	}
+}
 
 Spectra::Spectra(std::string fileName) {
-
-
 
 	string line;
 	ifstream myfile(fileName);
@@ -134,7 +151,3 @@ Spectra::Spectra(std::string fileName) {
 
 	isLoaded = true;
 }
-
-//void Spectra::unzoom(float screenWidth, float screenHeight) {
-//	setXYFactor(screenWidth, screenHeight, minX, maxX, minY, maxY);
-//}

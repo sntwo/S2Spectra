@@ -62,7 +62,7 @@ LWindow::LWindow()
 	yFactor = 1;
     xSmoother = 0;
 
-
+	drawMode = zoom;
 
 
 }
@@ -107,13 +107,14 @@ SDL_Color LWindow::getColor(int i){
 
 void LWindow::render(int idx)
 {
+
+	//render chromatogram
     float dif = timeEnd - timeStart;
     float percent = dif / spectras[idx].maxX;
     float n = spectras[idx].count * percent;
     xSmoother = (int)(0.5 / (viewport.w / n) - 5);
     if (xSmoother < 0) { xSmoother = 0 ;}
-    std::cout << "xsmooth is " << xSmoother << "\n";
-    
+   
 	for (int i = 0; i < spectras[idx].count; i++){
 		//intf("looping");
 
@@ -137,9 +138,32 @@ void LWindow::render(int idx)
         i += xSmoother;
         
 	}
-	//Render current frame
+
+	//render nametag
 	nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
 	SDL_RenderDrawLine(gRenderer, viewport.w - 200 - 30, 20 * idx + 8.5, viewport.w - 200 - 10, 20 * idx + 8.5);
+
+	//render integrations on key spectra
+	if (!spectras[idx].isKey) { return; }
+	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
+	for (int i = 0; i < 50; i++){
+		if (spectras[idx].integrations[i].isSet) {
+			printf("found integration to draw \n");
+
+			int xi = spectras[idx].integrations[i].startIndex;
+			int xf = spectras[idx].integrations[i].endIndex;
+			std::cout << "start index is " << xi << "\n";
+			std::cout << "end index is " << xf << "\n";
+
+			float x1 = (spectras[idx].times[xi] - xOffset) * xFactor;
+			float y1 = viewport.h - (spectras[idx].intensities[xi] - yOffset) * yFactor;
+			float x2 = (spectras[idx].times[xf + xSmoother + 1] - xOffset) * xFactor;
+			float y2 = viewport.h - (spectras[idx].intensities[xf + xSmoother + 1] - yOffset) * yFactor;
+
+			SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
+		}
+	}
+
 
 }
 
@@ -148,6 +172,35 @@ void LWindow::draw()
 	//Clear screen
 	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
+
+	if (mTracking) {
+		if (drawMode == zoom) {
+			SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
+			SDL_RenderSetViewport(gRenderer, &viewPort);
+			SDL_Rect outlineRect = { zOriginX, zOriginY, zWidth, zHeight };
+			SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+			SDL_RenderDrawRect(gRenderer, &outlineRect);
+		}
+		else if (drawMode == integrate) {
+			SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
+			SDL_RenderSetViewport(gRenderer, &viewPort);
+			SDL_Rect outlineRect = { zOriginX, viewport.y, zWidth, viewport.h };
+			SDL_SetRenderDrawColor(gRenderer, 0x00, 0xC8, 0x00, 0xFF);
+			SDL_RenderFillRect(gRenderer, &outlineRect);
+		}
+	}
+	else if (drawMode == integrate) {
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+		SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
+		SDL_RenderSetViewport(gRenderer, &viewPort);
+		SDL_RenderDrawLine(gRenderer, mx, viewport.y, mx, viewport.h + viewport.y);
+	}
+	else if (drawMode == deintegrate) {
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+		SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
+		SDL_RenderSetViewport(gRenderer, &viewPort);
+		SDL_RenderDrawLine(gRenderer, mx, viewport.y, mx, viewport.h + viewport.y);
+	}
 
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 
@@ -169,12 +222,28 @@ void LWindow::draw()
 		}
 	}
 
-	if (mTracking) {
-		SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
-		SDL_RenderSetViewport(gRenderer, &viewPort);
-		SDL_Rect outlineRect = { zOriginX, zOriginY, zWidth, zHeight };
-		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-		SDL_RenderDrawRect(gRenderer, &outlineRect);
+	SDL_Rect integrationTable;
+	integrationTable.x = 10;
+	integrationTable.y = mHeight / 1.6 + 10;
+	integrationTable.w = mWidth - 20;
+	integrationTable.h = mHeight - mHeight / 1.6 - 10;
+
+	SDL_RenderSetViewport(gRenderer, &integrationTable);
+
+	timeLabel.render(gRenderer, 0, 10);
+	areaLabel.render(gRenderer, 200, 10);
+	areaPercentLabel.render(gRenderer, 400, 10);
+
+	for (int i = 0; i < 6; i++){
+		if (spectras[i].isKey) {
+			for (int j = 0; j < 50; j++){
+				if (spectras[i].integrations[j].isSet) {
+					spectras[i].integrations[j].timeLabel.render(gRenderer, 0, 20 * j + 30);
+					spectras[i].integrations[j].areaLabel.render(gRenderer, 200, 20 * j + 30);
+					spectras[i].integrations[j].areaPercentLabel.render(gRenderer, 400, 20 * j + 30);
+				}
+			}
+		}
 	}
 
 
@@ -236,6 +305,20 @@ SDL_Renderer* LWindow::createRenderer()
 	}
 
 
+	SDL_Color tc = getColor(2);
+	std::string a = "Area";
+	std::string b = "Time";
+	std::string c = "Area Percent";
+	if (!areaLabel.loadFromRenderedText(a, tc, gRenderer, gFont)){
+
+	}
+	if (!areaPercentLabel.loadFromRenderedText(c, tc, gRenderer, gFont)){
+
+	}
+	if (!timeLabel.loadFromRenderedText(b, tc, gRenderer, gFont)){
+
+	}
+
 
 	return gRenderer;
 
@@ -245,10 +328,6 @@ void LWindow::handleEvent(SDL_Event& e)
 {
 	//Caption update flag
 	bool updateCaption = false;
-
-	//mouse position
-	int mx = 0;
-	int my = 0;
 
 	switch (e.type) {
 	case SDL_KEYDOWN:
@@ -263,7 +342,14 @@ void LWindow::handleEvent(SDL_Event& e)
 			timeEnd = 30.f;
 			isZoomed = false;
 			break;
-		}
+		case SDLK_i:
+			drawMode = integrate;
+			break;
+
+		case SDLK_z:
+		drawMode = zoom;
+		break;
+	}	
 
 	case SDL_WINDOWEVENT:
 		switch (e.window.event){
@@ -348,20 +434,21 @@ void LWindow::handleEvent(SDL_Event& e)
 
 	case SDL_MOUSEBUTTONDOWN:
 		SDL_GetMouseState(&mx, &my);
+
 		if (e.button.button == SDL_BUTTON_LEFT) {
 			int check = checkNameBoxes(mx, my);
 			if (check > -1) {
 				makeKey(check);
 			}
 			else {
-				SDL_GetMouseState(&mx, &my);
+				mTracking = true;
 				zWidth = 0;
 				zHeight = 0;
 				zOriginX = mx;
 				zOriginY = my;
-				mTracking = true;
 			}
 		}
+
 		else {
 			printf("unzooming");
 			xOffset = 0;
@@ -370,26 +457,56 @@ void LWindow::handleEvent(SDL_Event& e)
 			maxIntensity = 2000000.f;
 			timeStart = 0.f;
 			timeEnd = 30.f;
-			isZoomed = false;
+			isZoomed = false;	
 		}
 		break;
 
 	case SDL_MOUSEBUTTONUP:
 		if (e.button.button == SDL_BUTTON_LEFT) {
 			if (!mTracking) break;
-			SDL_GetMouseState(&mx, &my);
-			std::cout << "zooming to region " << time(zOriginX) << " " << time(mx) << " " << intensity(my) << " " << intensity(zOriginY) << "\n";
-
-			timeStart = time(zOriginX);
-			timeEnd = time(mx);
-			minIntensity = intensity(my);
-			maxIntensity = intensity(zOriginY);
-			xOffset = timeStart;
-			yOffset = minIntensity;
-
-			isZoomed = true;
 			mTracking = false;
-			draw();
+			SDL_GetMouseState(&mx, &my);
+			switch (drawMode){
+			case zoom:
+				std::cout << "zooming to region " << time(zOriginX) << " " << time(mx) << " " << intensity(my) << " " << intensity(zOriginY) << "\n";
+				timeStart = time(zOriginX);
+				timeEnd = time(mx);
+				minIntensity = intensity(my);
+				maxIntensity = intensity(zOriginY);
+				xOffset = timeStart;
+				yOffset = minIntensity;
+				isZoomed = true;
+				draw();
+				break;
+
+			case integrate:
+				SDL_Color tc = getColor(2);
+				for (int i = 0; i < 6; i++){
+					if (spectras[i].isKey){
+						int idx = spectras[i].integrate(time(zOriginX), time(mx));
+						for (int j = 0; j < 50; j++){
+							if (spectras[i].integrations[j].labelIsSet) { 
+								spectras[i].integrations[j].areaLabel.free(); 
+								spectras[i].integrations[j].timeLabel.free();
+								spectras[i].integrations[j].areaPercentLabel.free();
+
+							}
+							std::string time = "";
+							std::string area = "";
+							time += std::to_string(spectras[i].integrations[j].time);
+							area += std::to_string(spectras[i].integrations[j].area);
+							if (!spectras[i].integrations[j].timeLabel.loadFromRenderedText(time, tc, gRenderer, gFont)){
+							}
+							if (!spectras[i].integrations[j].areaLabel.loadFromRenderedText(area, tc, gRenderer, gFont)){
+							}
+							if (!spectras[i].integrations[j].areaPercentLabel.loadFromRenderedText(spectras[i].integrations[j].labelString, tc, gRenderer, gFont)){
+							}
+							spectras[i].integrations[j].labelIsSet = true;
+						}
+					}
+				}
+				break;
+			}
 		}
 		break;
 	}
