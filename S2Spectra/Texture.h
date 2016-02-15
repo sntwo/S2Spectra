@@ -13,7 +13,12 @@
 //#include <SDL2_image/SDL_image.h>
 //#include <SDL_image.h>
 //#include <SDL_ttf.h>
+#ifdef _WIN32
+#include <SDL_ttf.h>
+#else
 #include <SDL2_ttf/SDL_ttf.h>
+#endif
+
 #include <stdio.h>
 #include <string>
 //#include <cmath>
