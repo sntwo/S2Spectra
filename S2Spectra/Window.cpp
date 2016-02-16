@@ -353,7 +353,33 @@ void LWindow::handleEvent(SDL_Event& e)
 			//std::cout << "file is " << inputText << "\n";
 			spectras[i].loadFromString(inputText);
 			makeKey(i);
+		}
 
+		else if (e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
+			//copy attempt
+			std::string outString = "";
+			for (int i = 0; i < 6; i++){
+				if (spectras[i].isLoaded) {
+					
+					outString += spectras[i].name;
+					outString += "\n";
+					outString += "Time\tArea\tArea %\n";
+					
+					for (int j = 0; j < 50; j++){
+						if (spectras[i].integrations[j].isSet){
+							outString += std::to_string(spectras[i].integrations[j].time);
+							outString += "\t";
+							outString += std::to_string(spectras[i].integrations[j].area);
+							outString += "\t";
+							outString += spectras[i].integrations[j].labelString;
+							outString += "\n";
+						}
+					}
+				}
+			}
+			
+			SDL_SetClipboardText(outString.c_str());
+		
 		}
 
 		switch (e.key.keysym.sym) {
@@ -514,26 +540,23 @@ void LWindow::handleEvent(SDL_Event& e)
 					if (spectras[i].isKey){
 						int idx = spectras[i].integrate(time(zOriginX), time(mx));
 						for (int j = 0; j < 50; j++){
-							if (spectras[i].integrations[j].labelIsSet) {
-								//spectras[i].integrations[j].areaLabel.free();
-								//spectras[i].integrations[j].timeLabel.free();
-								//spectras[i].integrations[j].areaPercentLabel.free();
-
+							if (spectras[i].integrations[j].isSet){
+								std::string time = "";
+								std::string area = "";
+								time += std::to_string(spectras[i].integrations[j].time);
+								area += std::to_string(spectras[i].integrations[j].area);
+								if (!spectras[i].integrations[j].timeLabel.loadFromRenderedText(time, tc, gRenderer, gFont)){
+								}
+								if (!spectras[i].integrations[j].areaLabel.loadFromRenderedText(area, tc, gRenderer, gFont)){
+								}
+								if (!spectras[i].integrations[j].areaPercentLabel.loadFromRenderedText(spectras[i].integrations[j].labelString, tc, gRenderer, gFont)){
+								}
+								spectras[i].integrations[j].labelIsSet = true;
 							}
-							std::string time = "";
-							std::string area = "";
-							time += std::to_string(spectras[i].integrations[j].time);
-							area += std::to_string(spectras[i].integrations[j].area);
-							if (!spectras[i].integrations[j].timeLabel.loadFromRenderedText(time, tc, gRenderer, gFont)){
-							}
-							if (!spectras[i].integrations[j].areaLabel.loadFromRenderedText(area, tc, gRenderer, gFont)){
-							}
-							if (!spectras[i].integrations[j].areaPercentLabel.loadFromRenderedText(spectras[i].integrations[j].labelString, tc, gRenderer, gFont)){
-							}
-							spectras[i].integrations[j].labelIsSet = true;
 						}
 					}
 				}
+				draw();
 				break;
 			}
 			case deintegrate:
