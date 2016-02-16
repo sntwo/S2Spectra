@@ -22,7 +22,7 @@ struct Integration{
 	int endIndex = 0;
 	float area = 0;
 	bool isSet = false;
-	float time;
+	float time = 1000.f;
 	LTexture areaLabel;
 	LTexture timeLabel;
 	LTexture areaPercentLabel;
@@ -30,6 +30,8 @@ struct Integration{
 	bool labelIsSet = false;
 
 };
+
+
 
 class Spectra {
 
@@ -62,6 +64,8 @@ public:
 	int integrate(float, float);
 	int getTimeIndexForTime(float);
 	void redoStrings();
+	void deleteRange(float, float);
+	void loadFromString(std::string);
 
 	
 };

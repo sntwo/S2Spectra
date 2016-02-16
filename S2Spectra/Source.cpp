@@ -130,7 +130,10 @@ void close()
 
 int main(int argc, char* args[])
 {
-	printf("Hello world");
+	printf("commands: \n");
+	printf("(i) integrate \n");
+	printf("(z) zoom \n");
+	printf("(x) delete \n");
 	//Start up SDL and create window
 	if (!init())
 	{
@@ -151,7 +154,7 @@ int main(int argc, char* args[])
 			//Event handler
 			SDL_Event e;
 
-			Spectra spectra("export.txt");
+			//Spectra spectra("export.txt");
 
 			if (!gWindow.isMinimized()){
 

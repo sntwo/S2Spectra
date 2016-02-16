@@ -85,11 +85,11 @@ void LWindow::setColor(int i) {
 }
 
 SDL_Color LWindow::getColor(int i){
-	std::cout << "supplying color for int " << i << "\n";
+	//std::cout << "supplying color for int " << i << "\n";
 	SDL_Color textColor;
 	switch (i) {
 	case 0:
-		std::cout << "supplying yellow \n";
+		//std::cout << "supplying yellow \n";
 		textColor = { 0, 1, 1 }; // yellow
 		break;
 	case 1:
@@ -148,12 +148,12 @@ void LWindow::render(int idx)
 	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
 	for (int i = 0; i < 50; i++){
 		if (spectras[idx].integrations[i].isSet) {
-			printf("found integration to draw \n");
+			//printf("found integration to draw \n");
 
 			int xi = spectras[idx].integrations[i].startIndex;
 			int xf = spectras[idx].integrations[i].endIndex;
-			std::cout << "start index is " << xi << "\n";
-			std::cout << "end index is " << xf << "\n";
+			//std::cout << "start index is " << xi << "\n";
+			//std::cout << "end index is " << xf << "\n";
 
 			float x1 = (spectras[idx].times[xi] - xOffset) * xFactor;
 			float y1 = viewport.h - (spectras[idx].intensities[xi] - yOffset) * yFactor;
@@ -188,7 +188,15 @@ void LWindow::draw()
 			SDL_SetRenderDrawColor(gRenderer, 0x00, 0xC8, 0x00, 0xFF);
 			SDL_RenderFillRect(gRenderer, &outlineRect);
 		}
+		else if (drawMode == deintegrate) {
+			SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
+			SDL_RenderSetViewport(gRenderer, &viewPort);
+			SDL_Rect outlineRect = { zOriginX, viewport.y, zWidth, viewport.h };
+			SDL_SetRenderDrawColor(gRenderer, 0xC8, 0x00, 0x00, 0xFF);
+			SDL_RenderFillRect(gRenderer, &outlineRect);
+		}
 	}
+
 	else if (drawMode == integrate) {
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
 		SDL_Rect viewPort = { 0, 0, mWidth, mHeight };
@@ -264,7 +272,7 @@ float LWindow::intensity(int y){
 bool LWindow::init()
 {
 	//Create window
-	mWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	mWindow = SDL_CreateWindow("S2Spectra", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	if (mWindow != NULL)
 	{
@@ -331,9 +339,26 @@ void LWindow::handleEvent(SDL_Event& e)
 
 	switch (e.type) {
 	case SDL_KEYDOWN:
+		if (e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
+			//found paste attempt
+			std::string inputText = SDL_GetClipboardText(); 
+			int i = 0;
+			for (; i < 6; i++){
+				if (!spectras[i].isLoaded) {
+					break;
+				}
+			}
+
+			//printf("trying to paste file \n");
+			//std::cout << "file is " << inputText << "\n";
+			spectras[i].loadFromString(inputText);
+			makeKey(i);
+
+		}
+
 		switch (e.key.keysym.sym) {
 		case SDLK_MINUS:
-			printf("unzooming");
+			//printf("unzooming");
 			xOffset = 0;
 			yOffset = -500000;
 			minIntensity = -200000.f;
@@ -347,9 +372,13 @@ void LWindow::handleEvent(SDL_Event& e)
 			break;
 
 		case SDLK_z:
-		drawMode = zoom;
-		break;
-	}	
+			drawMode = zoom;
+			break;
+
+		case SDLK_x:
+			drawMode = deintegrate;
+			break;
+		}
 
 	case SDL_WINDOWEVENT:
 		switch (e.window.event){
@@ -419,8 +448,8 @@ void LWindow::handleEvent(SDL_Event& e)
 		spectras[i] = s;
 		makeKey(i);
 
-		}
-	    break;
+	}
+	break;
 
 	case SDL_MOUSEMOTION:
 		SDL_GetMouseState(&mx, &my);
@@ -450,14 +479,14 @@ void LWindow::handleEvent(SDL_Event& e)
 		}
 
 		else {
-			printf("unzooming");
+			//printf("unzooming");
 			xOffset = 0;
 			yOffset = -500000;
 			minIntensity = -200000.f;
 			maxIntensity = 2000000.f;
 			timeStart = 0.f;
 			timeEnd = 30.f;
-			isZoomed = false;	
+			isZoomed = false;
 		}
 		break;
 
@@ -468,7 +497,7 @@ void LWindow::handleEvent(SDL_Event& e)
 			SDL_GetMouseState(&mx, &my);
 			switch (drawMode){
 			case zoom:
-				std::cout << "zooming to region " << time(zOriginX) << " " << time(mx) << " " << intensity(my) << " " << intensity(zOriginY) << "\n";
+				//std::cout << "zooming to region " << time(zOriginX) << " " << time(mx) << " " << intensity(my) << " " << intensity(zOriginY) << "\n";
 				timeStart = time(zOriginX);
 				timeEnd = time(mx);
 				minIntensity = intensity(my);
@@ -479,16 +508,16 @@ void LWindow::handleEvent(SDL_Event& e)
 				draw();
 				break;
 
-			case integrate:
+			case integrate: {
 				SDL_Color tc = getColor(2);
 				for (int i = 0; i < 6; i++){
 					if (spectras[i].isKey){
 						int idx = spectras[i].integrate(time(zOriginX), time(mx));
 						for (int j = 0; j < 50; j++){
-							if (spectras[i].integrations[j].labelIsSet) { 
-								spectras[i].integrations[j].areaLabel.free(); 
-								spectras[i].integrations[j].timeLabel.free();
-								spectras[i].integrations[j].areaPercentLabel.free();
+							if (spectras[i].integrations[j].labelIsSet) {
+								//spectras[i].integrations[j].areaLabel.free();
+								//spectras[i].integrations[j].timeLabel.free();
+								//spectras[i].integrations[j].areaPercentLabel.free();
 
 							}
 							std::string time = "";
@@ -507,10 +536,18 @@ void LWindow::handleEvent(SDL_Event& e)
 				}
 				break;
 			}
+			case deintegrate:
+				for (int i = 0; i < 6; i++){
+					if (spectras[i].isKey){
+						spectras[i].deleteRange(time(zOriginX), time(mx));
+					}
+				}
+				break;
+			}
+
 		}
 		break;
 	}
-
 
 	//Update window caption with new data
 	if (updateCaption)
@@ -534,7 +571,7 @@ void LWindow::makeKey(int idx) {
 
 				SDL_Color tc = getColor(i);
 				nameTextures[i].isLoaded = false;
-				nameTextures[i].free();
+				//nameTextures[i].free();
 				if (!nameTextures[i].loadFromRenderedText(spectras[i].name, tc, gRenderer, gFont))
 				{
 					printf("Failed to render non bold text texture!\n");
@@ -549,7 +586,7 @@ void LWindow::makeKey(int idx) {
 			spectras[i].isKey = true;
 			if (nameTextures[i].isLoaded) {
 				nameTextures[i].isLoaded = false;
-				nameTextures[i].free();
+				//nameTextures[i].free();
 			}
 			SDL_Color tc = getColor(i);
 			if (!nameTextures[i].loadFromRenderedText(spectras[i].name, tc, gRenderer, gFontBold))
@@ -565,7 +602,7 @@ void LWindow::makeKey(int idx) {
 }
 
 int LWindow::checkNameBoxes(int x, int y){
-	std::cout << "checking " << x << " " << y << "\n";
+	//std::cout << "checking " << x << " " << y << "\n";
 	for (int i = 0; i < 6; i++){
 		if (spectras[i].isLoaded) {
 			if (x > (viewport.w - 230) && y < (20 * i + 25) && y >(20 * i + 5)){

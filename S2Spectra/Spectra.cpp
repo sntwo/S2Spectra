@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 
 using namespace std;
@@ -40,9 +41,26 @@ int Spectra::getTimeIndexForTime(float t){
 	return 0;
 }
 
+void Spectra::deleteRange(float startTime, float endTime) {
+	for (int i = 0; i < 50; i++){
+		if (integrations[i].isSet){
+			float st = times[integrations[i].startIndex];
+			float et = times[integrations[i].endIndex];
+			if (st < endTime && st > startTime) { integrations[i].isSet = false; }
+			if (et < endTime && st > startTime) { integrations[i].isSet = false; }
+		}
+	}
+
+}
+
+bool ValueCmp(Integration const & a, Integration const & b)
+{
+	return a.time < b.time;
+}
 
 int Spectra::integrate(float startTime, float endTime) {
-	printf("integrating");
+	//printf("integrating");
+	deleteRange(startTime, endTime);
 	//find first available integration
 	int emptyIndex;
 	for (emptyIndex = 0; emptyIndex < 50; emptyIndex++){
@@ -80,7 +98,9 @@ int Spectra::integrate(float startTime, float endTime) {
 	}
 	integrations[emptyIndex].area = area;
 	integrations[emptyIndex].time = times[runningHeightIndex];
-	std::cout << "area is " << area << "\n";
+	//std::cout << "area is " << area << "\n";
+
+	std::sort(integrations, integrations + 50, ValueCmp);
 
 	redoStrings();
 
@@ -104,6 +124,54 @@ void Spectra::redoStrings()
 	}
 }
 
+void Spectra::loadFromString(string str) {
+
+	std::istringstream myfile(str);
+	std::string line;
+
+	getline(myfile, line);  // chromatogram
+	//cout << line << "\n";
+	getline(myfile, name);  // name
+	cout << "Loading " << name << "\n";
+	getline(myfile, line);  // data points
+	cout << "Found " << line << "data points \n";
+	istringstream dp(line);
+	string skip;
+
+	dp >> skip >> skip >> count;
+	//cout << "count: " << count << "\n";
+	getline(myfile, line);  // time & intensity
+
+	int idx = 0;
+	while (getline(myfile, line)){
+
+		istringstream iss(line);
+		float x;
+		float y;
+		iss >> x >> y;
+		times[idx] = x;
+		intensities[idx] = y;
+		//cout << "x:" << x << "y:" << y << '\n';
+
+		if (x > maxX) { maxX = x; }
+		if (x < minX) { minX = x; }
+		if (y > maxY) { maxY = y; }
+		if (y < minY) { minY = y; }
+
+		idx++;
+	}
+	isLoaded = true;
+
+	/*cout << "maxX is " << maxX << "\n";
+	cout << "minX is " << minX << "\n";
+	cout << "maxY is " << maxY << "\n";
+	cout << "minY is " << minY << "\n";*/
+}
+
+	
+
+
+
 Spectra::Spectra(std::string fileName) {
 
 	string line;
@@ -111,16 +179,16 @@ Spectra::Spectra(std::string fileName) {
 	if (myfile.is_open()){
 
 		getline(myfile, line);  // chromatogram
-		cout << line << "\n";
+		//cout << line << "\n";
 		getline(myfile, name);  // name
-		cout << name << "\n";
+		cout << "Loading " << name << "\n";
 		getline(myfile, line);  // data points
-		cout << line << "\n";
+		cout << "Found " << line << "data points \n";
 		istringstream dp(line);
 		string skip;
 
 		dp >> skip >> skip >> count;
-		cout << "count: " << count << "\n";
+		//cout << "count: " << count << "\n";
 		getline(myfile, line);  // time & intensity
 
 		int idx = 0;
@@ -142,11 +210,11 @@ Spectra::Spectra(std::string fileName) {
 			idx++;
 		}
 		myfile.close();
-
-		cout << "maxX is " << maxX << "\n";
+		
+		/*cout << "maxX is " << maxX << "\n";
 		cout << "minX is " << minX << "\n";
 		cout << "maxY is " << maxY << "\n";
-		cout << "minY is " << minY << "\n";
+		cout << "minY is " << minY << "\n";*/
 	}
 
 	isLoaded = true;
