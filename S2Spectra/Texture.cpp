@@ -7,7 +7,11 @@
 //
 
 //#include <SDL2/SDL.h>
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 #include "Texture.h"
 
 
@@ -35,7 +39,7 @@ bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor
 	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
 	if (textSurface == NULL)
 	{
-		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+		//printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
 	}
 	else
 	{

@@ -8,6 +8,9 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Rect;
 
+
+enum DrawMode { zoom, integrate, deintegrate };
+
 class LWindow
 {
 public:
@@ -17,9 +20,11 @@ public:
 	//Creates window
 	bool init();
 
+	DrawMode drawMode;
 
 	Spectra spectras[6];
 	LTexture nameTextures[6];
+	
 
 	//Creates renderer from internal window
 	SDL_Renderer* createRenderer();
@@ -41,6 +46,10 @@ public:
 
 	//draw the content
 	void draw();
+
+	//mouse position;
+	int mx = 0;
+	int my = 0;
 
 private:
 	//Window data
@@ -89,6 +98,10 @@ private:
 	int checkNameBoxes(int x, int y);
 
 	void makeKey(int i);
+
+	LTexture timeLabel;
+	LTexture areaLabel;
+	LTexture areaPercentLabel;
 };
 
 

@@ -11,9 +11,27 @@
 
 #include <stdio.h>
 #include <string>
+#include "Texture.h"
 //#include <SDL.h>
 
 struct SDL_Renderer;
+
+struct Integration{
+
+	int startIndex = 0;
+	int endIndex = 0;
+	float area = 0;
+	bool isSet = false;
+	float time = 1000.f;
+	LTexture areaLabel;
+	LTexture timeLabel;
+	LTexture areaPercentLabel;
+	std::string labelString;
+	bool labelIsSet = false;
+
+};
+
+
 
 class Spectra {
 
@@ -21,15 +39,15 @@ public:
 	Spectra();
 	Spectra(std::string);
 	float times[50000], intensities[50000];
+	Integration integrations[50];
+	
 	float maxX = 0;
 	float maxY = 0;
 	float minX = 0;
 	float minY = 0;
 	long count = 0;
 	std::string name;
-	//void render(SDL_Renderer*);
-	//void render(SDL_Renderer*, float, float);
-	//void setXYFactor(float, float, float, float, float, float);
+	
 	float xFactor = 1;
 	float yFactor = 1;
 	float xOffset = 0;
@@ -38,13 +56,18 @@ public:
 	float time(int);
 	float intensity(int);
 
-	//void unzoom(float, float);
+	
 
 	bool isLoaded = false;
 	bool isKey = false;
 
-	//void getDisplayParameters(float &, float &, float &, float &);
-	//void setDisplayParamaters(float, float, float, float);
+	int integrate(float, float);
+	int getTimeIndexForTime(float);
+	void redoStrings();
+	void deleteRange(float, float);
+	void loadFromString(std::string);
+
+	
 };
 
 #endif /* Spectra_hpp */
