@@ -103,16 +103,15 @@ SDL_Color LWindow::getColor(int i){
 
 void LWindow::render(int idx)
 {
+    //calculate xSmoother to skip times when they are closer than a pixel
     float dif = timeEnd - timeStart;
     float percent = dif / spectras[idx].maxX;
     float n = spectras[idx].count * percent;
     xSmoother = (int)(0.5 / (viewport.w / n) - 5);
     if (xSmoother < 0) { xSmoother = 0 ;}
-    std::cout << "xsmooth is " << xSmoother << "\n";
     
+    //loop through spectra times and draw lines
 	for (int i = 0; i < spectras[idx].count; i++){
-		//intf("looping");
-
         while ( spectras[idx].times[i] < timeStart ) { i++; }
         if ( spectras[idx].times[i] > timeEnd ) { break; }
         if ( spectras[idx].intensities[i] < maxIntensity || spectras[idx].intensities[i + xSmoother + 1] < maxIntensity) {
@@ -128,13 +127,13 @@ void LWindow::render(int idx)
                     SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
                 }
             }
-		//d::cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n";
         }
         i += xSmoother;
         
 	}
-	//Render current frame
-	nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
+	
+    //draw file name and color line
+    nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
 	SDL_RenderDrawLine(gRenderer, viewport.w - 200 - 30, 20 * idx + 8.5, viewport.w - 200 - 10, 20 * idx + 8.5);
 
 }
