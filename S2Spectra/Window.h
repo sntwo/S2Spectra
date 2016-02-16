@@ -102,6 +102,8 @@ private:
 	LTexture timeLabel;
 	LTexture areaLabel;
 	LTexture areaPercentLabel;
+    
+    void redoStrings();
 };
 
 

@@ -70,17 +70,23 @@ LWindow::LWindow()
 void LWindow::setColor(int i) {
 	switch (i) {
 	case 0:
-		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0xFF, 0xFF); // yellow
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 64, 255, 0xFF); // blue
 		break;
 	case 1:
-		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
+		SDL_SetRenderDrawColor(gRenderer, 255, 64, 0x00, 0xFF); // red
 		break;
 	case 2:
-		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // black
+		SDL_SetRenderDrawColor(gRenderer, 0, 255, 64, 0xFF); // green
 		break;
 	case 3:
-		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
+		SDL_SetRenderDrawColor(gRenderer, 191, 0, 255, 0xFF); // purp;e
 		break;
+    case 4:
+        SDL_SetRenderDrawColor(gRenderer, 255, 255, 0, 0xFF); // orange
+        break;
+    case 5:
+        SDL_SetRenderDrawColor(gRenderer, 153, 102, 0, 0xFF); // brown?
+        break;
 	}
 }
 
@@ -135,9 +141,9 @@ void LWindow::render(int idx)
         i += xSmoother;
         
 	}
-	
-    //draw file name and color line
-    nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
+
+	//render nametag
+	nameTextures[idx].render(gRenderer, viewport.w - 200, 20 * idx);
 	SDL_RenderDrawLine(gRenderer, viewport.w - 200 - 30, 20 * idx + 8.5, viewport.w - 200 - 10, 20 * idx + 8.5);
 
 	//render integrations on key spectra
@@ -354,6 +360,7 @@ void LWindow::handleEvent(SDL_Event& e)
 
 		else if (e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
 			//copy attempt
+            printf("trying to copy");
 			std::string outString = "";
 			for (int i = 0; i < 6; i++){
 				if (spectras[i].isLoaded) {
@@ -372,8 +379,70 @@ void LWindow::handleEvent(SDL_Event& e)
 							outString += "\n";
 						}
 					}
+                    outString += "\n";
 				}
 			}
+            
+            float timesList[50];
+            for (int i = 0; i < 50; i++) {
+                timesList[i] = 10000.f;
+            }
+            
+            outString += "Impurity trend: \nTime\t";
+            for (int i = 0; i < 6; i++){
+                if (spectras[i].isLoaded) {
+                    outString += spectras[i].name;
+                    outString += "\t";
+                }
+            }
+        
+            outString += "\n";
+            int filled = 0;
+            for (int i = 0; i < 6; i++){
+                if (spectras[i].isLoaded) {
+                    for (int j = 0; j < 50; j++) {
+                        if (spectras[i].integrations[j].isSet) {
+                            bool found = false;
+                            for (int k = 0; k < 50; k++) {
+                                if (fabs(spectras[i].integrations[j].time - timesList[k]) < 0.2) {
+                                    found = true;
+                                }
+                            }
+                            if (!found){
+                                timesList[filled] = spectras[i].integrations[j].time;
+                                filled++;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            std::sort(timesList, timesList + 50);
+            
+            for (int i = 0; i < 50; i++){
+                outString += std::to_string(timesList[i]);
+                outString += "\t";
+                for (int j = 0; j < 6; j++) {
+                        if (spectras[j].isLoaded) {
+                            bool found = false;
+                            for (int k = 0; k < 50; k++) {
+                                if (spectras[j].integrations[k].isSet) {
+                                    
+                                    if (fabs(spectras[j].integrations[k].time - timesList[i]) < 0.2) {
+                                        outString += spectras[j].integrations[k].labelString;
+                                        outString += "\t";
+                                        found = true;
+                                    }
+                                }
+                            }
+                            if (!found) {
+                                outString += "--\t";
+                            }
+                        }
+                }
+                outString += "\n";
+               
+            }
 			
 			SDL_SetClipboardText(outString.c_str());
 		
@@ -532,25 +601,10 @@ void LWindow::handleEvent(SDL_Event& e)
 				break;
 
 			case integrate: {
-				SDL_Color tc = getColor(2);
 				for (int i = 0; i < 6; i++){
 					if (spectras[i].isKey){
-						int idx = spectras[i].integrate(time(zOriginX), time(mx));
-						for (int j = 0; j < 50; j++){
-							if (spectras[i].integrations[j].isSet){
-								std::string time = "";
-								std::string area = "";
-								time += std::to_string(spectras[i].integrations[j].time);
-								area += std::to_string(spectras[i].integrations[j].area);
-								if (!spectras[i].integrations[j].timeLabel.loadFromRenderedText(time, tc, gRenderer, gFont)){
-								}
-								if (!spectras[i].integrations[j].areaLabel.loadFromRenderedText(area, tc, gRenderer, gFont)){
-								}
-								if (!spectras[i].integrations[j].areaPercentLabel.loadFromRenderedText(spectras[i].integrations[j].labelString, tc, gRenderer, gFont)){
-								}
-								spectras[i].integrations[j].labelIsSet = true;
-							}
-						}
+						spectras[i].integrate(time(zOriginX), time(mx));
+                        redoStrings();
 					}
 				}
 				draw();
@@ -560,6 +614,7 @@ void LWindow::handleEvent(SDL_Event& e)
 				for (int i = 0; i < 6; i++){
 					if (spectras[i].isKey){
 						spectras[i].deleteRange(time(zOriginX), time(mx));
+                        redoStrings();
 					}
 				}
 				break;
@@ -577,6 +632,29 @@ void LWindow::handleEvent(SDL_Event& e)
 		SDL_SetWindowTitle(mWindow, caption.str().c_str());
 	}
 
+}
+
+void LWindow::redoStrings() {
+    SDL_Color tc = getColor(2);
+    for (int i = 0; i < 6; i++){
+        if (spectras[i].isKey){
+            for (int j = 0; j < 50; j++){
+                if (spectras[i].integrations[j].isSet){
+                    std::string time = "";
+                    std::string area = "";
+                    time += std::to_string(spectras[i].integrations[j].time);
+                    area += std::to_string(spectras[i].integrations[j].area);
+                    if (!spectras[i].integrations[j].timeLabel.loadFromRenderedText(time, tc, gRenderer, gFont)){
+                    }
+                    if (!spectras[i].integrations[j].areaLabel.loadFromRenderedText(area, tc, gRenderer, gFont)){
+                    }
+                    if (!spectras[i].integrations[j].areaPercentLabel.loadFromRenderedText(spectras[i].integrations[j].labelString, tc, gRenderer, gFont)){
+                    }
+                    spectras[i].integrations[j].labelIsSet = true;
+                }
+            }
+        }
+    }
 }
 
 void LWindow::makeKey(int idx) {
@@ -604,6 +682,8 @@ void LWindow::makeKey(int idx) {
 		}
 		else {
 			spectras[i].isKey = true;
+            spectras[i].redoStrings();
+            redoStrings();
 			if (nameTextures[i].isLoaded) {
 				nameTextures[i].isLoaded = false;
 				//nameTextures[i].free();

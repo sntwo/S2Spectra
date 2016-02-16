@@ -3,7 +3,7 @@
 //  S2Spectra
 //
 //  Created by Joshua Knapp on 2/9/16.
-//  Copyright © 2016 SnTwo. All rights reserved.
+//  Copyright ï¿½ 2016 SnTwo. All rights reserved.
 //
 
 #include "Spectra.h"
@@ -41,22 +41,28 @@ int Spectra::getTimeIndexForTime(float t){
 	return 0;
 }
 
+bool ValueCmp(Integration const & a, Integration const & b)
+{
+    return a.time < b.time;
+}
+
+
 void Spectra::deleteRange(float startTime, float endTime) {
 	for (int i = 0; i < 50; i++){
 		if (integrations[i].isSet){
 			float st = times[integrations[i].startIndex];
 			float et = times[integrations[i].endIndex];
-			if (st < endTime && st > startTime) { integrations[i].isSet = false; }
-			if (et < endTime && st > startTime) { integrations[i].isSet = false; }
+            if (st < endTime && st > startTime) {integrations[i].isSet = false;  integrations[i].time = 10000;}
+			if (et < endTime && st > startTime) { integrations[i].isSet = false; integrations[i].time = 10000;}
 		}
 	}
+    
+    std::sort(integrations, integrations + 50, ValueCmp);
+    redoStrings();
+
 
 }
 
-bool ValueCmp(Integration const & a, Integration const & b)
-{
-	return a.time < b.time;
-}
 
 int Spectra::integrate(float startTime, float endTime) {
 	//printf("integrating");
@@ -88,14 +94,19 @@ int Spectra::integrate(float startTime, float endTime) {
 
 	float area = 0;
 	int runningHeightIndex = 0;
-	float runningHeight = 0;
+    float runningHeight = intensities[startIndex];
 	for (int i = startIndex; i < endIndex + 1; i++){
 		if (intensities[i] > runningHeight) { runningHeight = intensities[i]; runningHeightIndex = i; }
 		float ct = intensities[i] - ( slope * ( times[i] - times[startIndex]) + intensities[startIndex] );
 		if (ct > 0) {
 			area += ct;
 		}
+        
+        if (times[runningHeightIndex] == 0) {
+            runningHeightIndex = (int)(((endIndex - startIndex) / 2) + startIndex);
+        }
 	}
+    
 	integrations[emptyIndex].area = area;
 	integrations[emptyIndex].time = times[runningHeightIndex];
 	//std::cout << "area is " << area << "\n";
@@ -115,6 +126,8 @@ void Spectra::redoStrings()
 			totalCount += integrations[i].area;
 		}
 	}
+    
+    //std::cout << "total count is " << totalCount << "\n";
 
 	for (int i = 0; i < 50; i++){
 		if (integrations[i].isSet){
