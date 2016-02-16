@@ -1,9 +1,12 @@
 #ifndef SDL_H
-#include <SDL2/SDL.h>
+
 #include "Spectra.h"
-#endif
+#include "Texture.h"
 
-
+union SDL_Event;
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Rect;
 
 class LWindow
 {
@@ -13,8 +16,10 @@ public:
 
 	//Creates window
 	bool init();
-    
-    Spectra spectra;
+
+
+	Spectra spectras[6];
+	LTexture nameTextures[6];
 
 	//Creates renderer from internal window
 	SDL_Renderer* createRenderer();
@@ -33,14 +38,17 @@ public:
 	bool hasMouseFocus();
 	bool hasKeyboardFocus();
 	bool isMinimized();
-    
-    //draw the content
-    void draw();
-    
+
+	//draw the content
+	void draw();
+
 private:
 	//Window data
 	SDL_Window* mWindow;
 	SDL_Renderer* gRenderer;
+
+	void setColor(int i);
+	SDL_Color getColor(int i);
 
 	//Window dimensions
 	int mWidth;
@@ -51,14 +59,39 @@ private:
 	bool mKeyboardFocus;
 	bool mFullScreen;
 	bool mMinimized;
-    
-    //if a zoom box is being drawin
-    bool mTracking;
-    
-    //chromatogram zoom rectangle info
-    int zOriginX;
-    int zOriginY;
-    int zWidth;
-    int zHeight;
+
+	//if a zoom box is being drawin
+	bool mTracking;
+	bool isZoomed;
+
+	//chromatogram zoom rectangle info
+	int zOriginX;
+	int zOriginY;
+	int zWidth;
+	int zHeight;
+	float xOffset;
+	float yOffset;
+
+	void render(int);
+	float timeStart;
+	float timeEnd;
+	float minIntensity;
+	float maxIntensity;
+
+	float time(int);
+	float intensity(int);
+
+	float xFactor;
+	float yFactor;
+    int xSmoother;
+
+	//checks to see if click is in name box region, returning index of spectra if true or -1 if false
+	int checkNameBoxes(int x, int y);
+
+	void makeKey(int i);
 };
 
+
+
+
+#endif
