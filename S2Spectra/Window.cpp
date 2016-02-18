@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <SDL.h>
@@ -73,16 +74,16 @@ void LWindow::setColor(int i) {
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 64, 255, 0xFF); // blue
 		break;
 	case 1:
-		SDL_SetRenderDrawColor(gRenderer, 255, 64, 0x00, 0xFF); // red
+		SDL_SetRenderDrawColor(gRenderer, 0, 255, 64, 0xFF); // green
 		break;
 	case 2:
-		SDL_SetRenderDrawColor(gRenderer, 0, 255, 64, 0xFF); // green
+		SDL_SetRenderDrawColor(gRenderer, 255, 255, 0, 0xFF); // orange
 		break;
 	case 3:
 		SDL_SetRenderDrawColor(gRenderer, 191, 0, 255, 0xFF); // purp;e
 		break;
     case 4:
-        SDL_SetRenderDrawColor(gRenderer, 255, 255, 0, 0xFF); // orange
+		SDL_SetRenderDrawColor(gRenderer, 64, 0, 255, 0xFF); // red
         break;
     case 5:
         SDL_SetRenderDrawColor(gRenderer, 153, 102, 0, 0xFF); // brown?
@@ -604,9 +605,10 @@ void LWindow::handleEvent(SDL_Event& e)
 				for (int i = 0; i < 6; i++){
 					if (spectras[i].isKey){
 						spectras[i].integrate(time(zOriginX), time(mx));
-                        redoStrings();
+                        
 					}
 				}
+				redoStrings();
 				draw();
 				break;
 			}
@@ -614,9 +616,11 @@ void LWindow::handleEvent(SDL_Event& e)
 				for (int i = 0; i < 6; i++){
 					if (spectras[i].isKey){
 						spectras[i].deleteRange(time(zOriginX), time(mx));
-                        redoStrings();
+                        
 					}
 				}
+				redoStrings();
+				draw();
 				break;
 			}
 
